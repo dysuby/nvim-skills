@@ -11,10 +11,10 @@ The user just says "help me configure Neovim" and the skill takes over — actin
 The conversation runs in five phases:
 
 1. **Detect experience level** — distinguishes newbies from experts and adjusts explanation depth throughout
-2. **Environment check** — confirms OS, Neovim version, and Nerd Font installation
-3. **Module-by-module setup** — walks through 17 optional plugin modules one at a time
-4. **Keybinding customization** — summarizes all keybindings and lets the user change any of them
-5. **Generate config files** — outputs complete Lua files with installation instructions
+2. **Environment check** — auto-runs `nvim --version`, `git --version`, and `uname` to detect OS and prerequisites without asking the user; also scans for an existing config and offers to add to it, start fresh, or show what's missing
+3. **Module-by-module setup** — walks through 17 optional plugin modules one at a time, using interactive option buttons (single-select and multi-select) for every choice; skips already-configured modules when updating an existing setup
+4. **Keybinding customization** — summarizes all keybindings, checks for conflicts against a session-wide registry and critical Neovim built-ins, and lets the user resolve any conflicts or change bindings before generating
+5. **Generate config files** — outputs complete Lua files with installation instructions; never overwrites files the user chose to keep
 
 ---
 
@@ -48,6 +48,41 @@ The conversation runs in five phases:
 **Newbie mode**: explains each module before asking — what it is, why it's useful, with analogies. Goes slow, one step at a time.
 
 **Expert mode**: lists plugin name + one-line summary. Quick yes/no. No unnecessary explanation.
+
+---
+
+## Interactive choices
+
+All decisions are presented as clickable option buttons via `AskUserQuestion` — no typing required. Multi-select is used for bulk choices like language parsers and LSP servers.
+
+---
+
+## Re-entrant — safe to run on an existing config
+
+When the skill detects an existing `~/.config/nvim/`, it offers three paths:
+
+- **Add to / update** — checks each plugin file individually; prompts only for modules that aren't configured yet or the user wants to change
+- **Start fresh** — proceeds as a new setup
+- **Show what's missing** — compares the existing config against all available modules and suggests additions
+
+Files the user chooses to keep are never overwritten.
+
+---
+
+## Keybinding conflict detection
+
+A running registry tracks every keybinding assigned during the session. Before confirming any binding, the skill checks it against:
+
+- Bindings already assigned earlier in the session (or found in the existing config)
+- Critical Neovim built-ins (`h/j/k/l`, `dd`, `yy`, `u`, `<C-r>`, etc.) that are dangerous to shadow
+
+If a conflict is found, the user is prompted to pick a different binding or consciously override.
+
+---
+
+## Language
+
+Responds in **English by default**. Switches to Chinese automatically if the user writes in Chinese. Config file comments follow the same language.
 
 ---
 
@@ -116,10 +151,4 @@ nvim-setup/
     ├── plugins.md            # lazy.nvim specs for all plugins
     ├── keybindings.md        # Keybinding defaults and community best practices
     └── config-template.md    # Templates for init.lua / options.lua / keymaps.lua
-
-nvim-setup-workspace/
-└── iteration-1/              # Eval run outputs
-    ├── eval-1-python-newbie/
-    ├── eval-2-ts-rust-expert/
-    └── eval-3-newbie-no-lsp/
 ```
