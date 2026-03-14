@@ -1,0 +1,42 @@
+{
+  "eval_id": 3,
+  "eval_name": "newbie-no-lsp-custom-key",
+  "prompt": "我想配置 Neovim，我是新手。我不想要 LSP，太复杂了。我只要文件树、好看的颜色和模糊搜索就好。把 find files 的快捷键改成 Ctrl+P。",
+  "assertions": [
+    {
+      "id": "no_lsp_file",
+      "description": "lsp.lua should NOT exist (user refused LSP)",
+      "check": "! test -f outputs/lua/config/plugins/lsp.lua"
+    },
+    {
+      "id": "no_cmp_file",
+      "description": "cmp.lua should NOT exist (no LSP means no completion engine needed)",
+      "check": "! test -f outputs/lua/config/plugins/cmp.lua"
+    },
+    {
+      "id": "ctrl_p_find_files",
+      "description": "telescope.lua maps find_files to <C-p>, NOT <leader>ff",
+      "check": "grep -i 'C-p\\|ctrl.*p' outputs/lua/config/plugins/telescope.lua && ! grep '\"<leader>ff\"' outputs/lua/config/plugins/telescope.lua"
+    },
+    {
+      "id": "has_neo_tree",
+      "description": "neo-tree.lua exists (user wanted file explorer)",
+      "check": "test -f outputs/lua/config/plugins/neo-tree.lua"
+    },
+    {
+      "id": "has_telescope",
+      "description": "telescope.lua exists (user wanted fuzzy search)",
+      "check": "test -f outputs/lua/config/plugins/telescope.lua"
+    },
+    {
+      "id": "has_colorscheme",
+      "description": "colorscheme.lua exists (user wanted nice colors)",
+      "check": "test -f outputs/lua/config/plugins/colorscheme.lua"
+    },
+    {
+      "id": "minimal_plugin_count",
+      "description": "No more than 8 plugin files (config stays minimal, no LSP-related extras)",
+      "check": "[ $(ls outputs/lua/config/plugins/ | wc -l) -le 8 ]"
+    }
+  ]
+}

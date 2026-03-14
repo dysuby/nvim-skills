@@ -1,0 +1,23 @@
+{
+  "skill_name": "nvim-setup",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我从来没用过 Neovim，但是想学，帮我从零开始配置一个好用的开发环境，我主要写 Python。",
+      "expected_output": "Skill should detect newbie, ask about OS, explain each plugin before asking to install, eventually generate a complete Lua config with Python LSP (pyright), Python Treesitter parser, and all chosen plugins assembled correctly.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "帮我 setup neovim，我是老手，用过 vim 多年。我主要写 TypeScript 和 Rust，macOS。给我推荐一个现代化的配置。",
+      "expected_output": "Skill should detect expert, skip long explanations, efficiently go through modules, generate config with ts_ls + rust_analyzer LSP, TypeScript/Rust Treesitter parsers, Tokyo Night or similar dark theme.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我想配置 Neovim，我是新手。我不想要 LSP，太复杂了。我只要文件树、好看的颜色和模糊搜索就好。把 find files 的快捷键改成 Ctrl+P。",
+      "expected_output": "Skill should respect user's decision to skip LSP (and related cmp/mason), install only neo-tree + colorscheme + telescope, and customize the telescope find_files keybinding to <C-p> in the generated config.",
+      "files": []
+    }
+  ]
+}

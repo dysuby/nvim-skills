@@ -1,0 +1,47 @@
+{
+  "eval_id": 1,
+  "eval_name": "python-newbie",
+  "prompt": "我从来没用过 Neovim，但是想学，帮我从零开始配置一个好用的开发环境，我主要写 Python。",
+  "assertions": [
+    {
+      "id": "has_pyright_lsp",
+      "description": "lsp.lua contains pyright for Python language server",
+      "check": "grep -r 'pyright' outputs/lua/config/plugins/lsp.lua"
+    },
+    {
+      "id": "has_python_treesitter",
+      "description": "treesitter.lua includes 'python' in ensure_installed parsers",
+      "check": "grep 'python' outputs/lua/config/plugins/treesitter.lua"
+    },
+    {
+      "id": "has_which_key",
+      "description": "which-key.lua exists (recommended for newbies)",
+      "check": "test -f outputs/lua/config/plugins/which-key.lua"
+    },
+    {
+      "id": "has_space_leader",
+      "description": "options.lua sets leader key to space",
+      "check": "grep 'mapleader.*\\\" \\\"\\|mapleader.*\" \"' outputs/lua/config/options.lua"
+    },
+    {
+      "id": "has_relativenumber",
+      "description": "options.lua enables relativenumber (community best practice)",
+      "check": "grep 'relativenumber' outputs/lua/config/options.lua"
+    },
+    {
+      "id": "has_scrolloff",
+      "description": "options.lua sets scrolloff (community best practice)",
+      "check": "grep 'scrolloff' outputs/lua/config/options.lua"
+    },
+    {
+      "id": "has_catppuccin",
+      "description": "colorscheme.lua uses catppuccin theme",
+      "check": "grep -i 'catppuccin' outputs/lua/config/plugins/colorscheme.lua"
+    },
+    {
+      "id": "has_all_core_files",
+      "description": "All 4 core config files exist (init.lua, options.lua, keymaps.lua, lazy.lua)",
+      "check": "test -f outputs/init.lua && test -f outputs/lua/config/options.lua && test -f outputs/lua/config/keymaps.lua && test -f outputs/lua/config/lazy.lua"
+    }
+  ]
+}
