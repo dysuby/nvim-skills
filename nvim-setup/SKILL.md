@@ -31,27 +31,6 @@ entire session. Do not mix languages mid-conversation.
 
 ---
 
-## File Writer Pattern
-
-After collecting choices for each module, **dispatch a subagent** to write the config file.
-This keeps the main conversation lean — the subagent needs no prior context, just the final code.
-
-Subagent prompt template:
-```
-Write this Neovim config file. Use the Write tool (create parent directories with Bash mkdir -p if needed).
-
-File: ~/.config/nvim/lua/config/plugins/<module>.lua
-Content:
-<exact Lua code with all placeholders replaced by user's choices>
-```
-
-The subagent runs in the background while you move on to the next module question.
-This way context stays small and the user sees files appear in real time.
-
-For base files (init.lua, options.lua, keymaps.lua, lazy.lua), write them directly yourself
-since they're simple substitutions and don't need a subagent.
-
----
 
 ## Phase 1: Detect Experience Level
 
@@ -164,7 +143,7 @@ Register `<C-s>`, `<C-h/j/k/l>`, `<S-h>`, `<S-l>` upfront (used by base keymaps.
 ## Phase 3A — Expert Mode (batch questions + parallel writes)
 
 Experts don't need explanations and don't want 30 rounds of back-and-forth. Collect
-everything in 2-3 batched rounds, then dispatch all file-writer subagents in parallel.
+everything in 2-3 batched rounds, then write all config files at once.
 
 ### Expert Round 1 — plugin selection (4 questions × 4 options = all 16 plugins):
 
@@ -237,21 +216,21 @@ Q3 (if toggleterm): "Toggleterm toggle key?"
 Options: <C-\\> / <C-t> / Other
 ```
 
-### Expert: dispatch all file-writers in parallel
+### Expert: write all config files
 
 Once all rounds are done, read the relevant sections of `references/plugins.md` and
-**dispatch all file-writer subagents simultaneously** — one per chosen plugin, plus
-`options.lua` and `keymaps.lua` written directly. All writes happen in parallel.
+**write all plugin files back-to-back using the Write tool** — one per chosen plugin, plus
+`options.lua` and `keymaps.lua`. Use `Bash mkdir -p` first if the directory doesn't exist.
 
-Tell the user: "All choices collected — writing [N] config files in parallel..."
-Then confirm each file as its subagent completes: "✓ telescope.lua ✓ lsp.lua ✓ cmp.lua ..."
+Tell the user: "All choices collected — writing [N] config files..."
+Confirm each file as it's written: "✓ telescope.lua ✓ lsp.lua ✓ cmp.lua ..."
 
 ---
 
 ## Phase 3B — Newbie Mode (sequential, with explanations)
 
 Walk through each module one at a time. Before asking about each module, give a short
-friendly explanation. After the user answers, dispatch the file-writer subagent and
+friendly explanation. After the user answers, write the config file directly and
 confirm before moving to the next module.
 
 ### Module 0: Base Configuration
@@ -291,7 +270,8 @@ Always included. Already written in Phase 2. Briefly explain it to newbies.
 2. Ask the `AskUserQuestion` for this module
 3. If user says Yes / selects options:
    a. Note keybindings in registry
-   b. **Dispatch a file-writer subagent** to write the plugin file immediately
+   b. **Use the Write tool** to write the plugin file immediately (read the relevant
+      section of `references/plugins.md` for the Lua code, substitute user choices)
    c. Tell the user "✓ Written to `~/.config/nvim/lua/config/plugins/<name>.lua`"
 4. Move on to the next module
 
@@ -318,7 +298,7 @@ Options:
   - "Light"
 ```
 
-Write `colorscheme.lua` via subagent with the chosen theme and variant.
+Write `colorscheme.lua` with the chosen theme and variant.
 
 ### Module 3: File Explorer — neo-tree.nvim
 
@@ -335,7 +315,7 @@ Question: "Keybinding to toggle the file tree?"
 Options: "<leader>e (default)" / "<leader>t" / "Other — I'll specify"
 ```
 
-Write `neo-tree.lua` via subagent with the chosen keybinding.
+Write `neo-tree.lua` using the Write tool with the chosen keybinding.
 
 ### Module 4: Fuzzy Finder — Telescope.nvim
 
@@ -356,7 +336,7 @@ Options: "<leader>ff (default)" / "<C-p> (VS Code style)" / "Other — I'll spec
 Other Telescope defaults (`<leader>fg`, `<leader>fb`, `<leader>fh`) are set automatically
 — mention them but don't prompt.
 
-Write `telescope.lua` via subagent with the chosen find-files keybinding.
+Write `telescope.lua` using the Write tool with the chosen find-files keybinding.
 
 ### Module 5: Syntax Highlighting — nvim-treesitter
 
@@ -375,7 +355,7 @@ Options: lua, python, javascript, typescript, rust, go, c, cpp, markdown
 
 Always include `lua` regardless of selection.
 
-Write `treesitter.lua` via subagent with the selected parsers.
+Write `treesitter.lua` using the Write tool with the selected parsers.
 
 ### Module 6: LSP — Language Server Protocol
 
@@ -399,7 +379,7 @@ Options: lua_ls (always included), pyright (Python), ts_ls (TypeScript/JS),
 `lua_ls` is always included. LSP keybindings (set automatically, mention to user):
 `gd`, `gr`, `K`, `<leader>rn`, `<leader>ca`, `[d`/`]d`
 
-Write `lsp.lua` via subagent with the selected servers and LSP keybindings.
+Write `lsp.lua` using the Write tool with the selected servers and LSP keybindings.
 
 ### Module 7: Autocompletion — nvim-cmp
 
@@ -413,7 +393,7 @@ Options: "Yes (recommended if you installed LSP)" / "No"
 Includes: cmp-nvim-lsp, cmp-buffer, cmp-path, LuaSnip + cmp_luasnip.
 Default keybindings: `<C-Space>` trigger, `<CR>` confirm, `<Tab>`/`<S-Tab>` navigate.
 
-Write `cmp.lua` via subagent.
+Write `cmp.lua` using the Write tool.
 
 ### Module 8: Status Line — lualine.nvim
 
@@ -426,7 +406,7 @@ Options: "Yes" / "No"
 
 Theme is set to match the chosen colorscheme automatically.
 
-Write `lualine.lua` via subagent.
+Write `lualine.lua` using the Write tool.
 
 ### Module 9: Git Integration
 
@@ -441,7 +421,7 @@ Options (multiSelect: true):
 Newbie note: gitsigns is a great start; fugitive is more for power users.
 Gitsigns keybindings: `<leader>hs`, `<leader>hr`, `<leader>hp`.
 
-Write `gitsigns.lua` and/or `fugitive.lua` via subagent based on selection.
+Write `gitsigns.lua` and/or `fugitive.lua` using the Write tool based on selection.
 
 ### Module 10: Terminal Integration — toggleterm.nvim
 
@@ -458,7 +438,7 @@ Question: "Keybinding to toggle the terminal?"
 Options: "<C-\\> (default)" / "<C-t>" / "Other — I'll specify"
 ```
 
-Write `toggleterm.lua` via subagent with the chosen keybinding.
+Write `toggleterm.lua` using the Write tool with the chosen keybinding.
 
 ### Module 11: Which-key — which-key.nvim
 
@@ -470,7 +450,7 @@ Question: "Install which-key (keybinding hints)?"
 Options: "Yes (recommended for newbies)" / "No"
 ```
 
-Write `which-key.lua` via subagent.
+Write `which-key.lua` using the Write tool.
 
 ### Module 12: Auto-pairs — nvim-autopairs
 
@@ -479,7 +459,7 @@ Question: "Install autopairs? (auto-closes (, {, [, quotes, etc.)"
 Options: "Yes" / "No"
 ```
 
-Write `autopairs.lua` via subagent.
+Write `autopairs.lua` using the Write tool.
 
 ### Module 13: Comment.nvim
 
@@ -488,7 +468,7 @@ Question: "Install Comment.nvim? (gcc to comment a line, gc for visual selection
 Options: "Yes" / "No"
 ```
 
-Write `comment.lua` via subagent.
+Write `comment.lua` using the Write tool.
 
 ### Module 14: Buffer Tabs — bufferline.nvim
 
@@ -499,7 +479,7 @@ Question: "Install bufferline (tab bar at the top)?"
 Options: "Yes" / "No — I'll use Telescope for buffer switching"
 ```
 
-Write `bufferline.lua` via subagent.
+Write `bufferline.lua` using the Write tool.
 
 ### Module 15: Indent Lines — indent-blankline.nvim
 
@@ -510,7 +490,7 @@ Question: "Install indent-blankline (indentation guide lines)?"
 Options: "Yes" / "No"
 ```
 
-Write `indent-blankline.lua` via subagent.
+Write `indent-blankline.lua` using the Write tool.
 
 ### Module 16: Noice.nvim — UI Overhaul
 
@@ -522,7 +502,7 @@ Question: "Install noice.nvim (fancy floating UI for cmdline/notifications)?"
 Options: "Yes" / "No"
 ```
 
-Write `noice.lua` via subagent.
+Write `noice.lua` using the Write tool.
 
 ### Module 17: nvim-surround
 
@@ -535,7 +515,7 @@ Question: "Install nvim-surround?"
 Options: "Yes" / "No"
 ```
 
-Write `surround.lua` via subagent.
+Write `surround.lua` using the Write tool.
 
 ---
 
@@ -560,7 +540,7 @@ Options:
 ```
 
 If they want changes, let them describe in free text, apply the changes, then
-**re-dispatch the affected file-writer subagents** to update just those files.
+**re-write the affected files** to update just those files.
 
 ---
 
@@ -585,5 +565,5 @@ No bulk code dump at the end — everything was applied incrementally. ✨
 - For newbies: go slow, one step at a time, celebrate their choices
 - For experts: be efficient, list-style, no unnecessary explanation
 - **Always use `AskUserQuestion`** when presenting choices
-- After dispatching a file-write subagent, briefly confirm to the user what was written
+- After writing a plugin file, briefly confirm to the user what was written
   (e.g., "✓ `telescope.lua` written") before moving to the next module
