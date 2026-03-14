@@ -91,39 +91,6 @@ Only files for chosen modules are generated. Newbie configs include inline expla
 
 ---
 
-## Installation
-
-This skill is distributed as a **Claude Code plugin**. You need [Claude Code](https://claude.ai/code) and the [Superpowers plugin](https://github.com/anthropics/claude-plugins-official) installed first.
-
-### From GitHub (recommended)
-
-Add this repository as a marketplace and install the plugin:
-
-```bash
-claude plugin marketplace add github:dysuby/nvim-setup-skill
-claude plugin install nvim-setup
-```
-
-### Local installation
-
-Clone the repo and point Claude Code at it directly:
-
-```bash
-git clone https://github.com/dysuby/nvim-setup-skill
-claude plugin marketplace add ./nvim-setup-skill
-claude plugin install nvim-setup
-```
-
-### Verify installation
-
-```bash
-claude plugin list
-```
-
-You should see `nvim-setup` in the list. The skill is immediately available in any Claude Code session — no restart needed.
-
----
-
 ## Usage
 
 Just talk to Claude Code naturally:
