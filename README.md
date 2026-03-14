@@ -100,7 +100,7 @@ This skill is distributed as a **Claude Code plugin**. You need [Claude Code](ht
 Add this repository as a marketplace and install the plugin:
 
 ```bash
-claude plugin marketplace add github:YOUR_USERNAME/nvim-setup-skill
+claude plugin marketplace add github:dysuby/nvim-setup-skill
 claude plugin install nvim-setup
 ```
 
@@ -109,7 +109,7 @@ claude plugin install nvim-setup
 Clone the repo and point Claude Code at it directly:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/nvim-setup-skill
+git clone https://github.com/dysuby/nvim-setup-skill
 claude plugin marketplace add ./nvim-setup-skill
 claude plugin install nvim-setup
 ```
