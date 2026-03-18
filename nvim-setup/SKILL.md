@@ -404,7 +404,7 @@ Question: "Install lualine (status line)?"
 Options: "Yes" / "No"
 ```
 
-Theme is set to match the chosen colorscheme automatically.
+Always use `theme = "auto"` — lualine will pick up the active colorscheme automatically. Do not hardcode the theme name (e.g. `"catppuccin"`) as it may not be loaded yet when lualine initializes.
 
 Write `lualine.lua` using the Write tool.
 
